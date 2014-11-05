@@ -34,6 +34,19 @@ describe ErrorappNotifier::Notify do
         ErrorappNotifier::Notifier.should_receive(:notify_error).with(data)
         ErrorappNotifier::Notify.notify_with_controller(*args)
       end
+
+      it "should not notify if ignored" do
+        @config.ignore_exceptions = ['IgnoreMe']
+        exception = double('exception', class: 'IgnoreMe')
+        controller = double('controller')
+        request = double('request')
+        args = [exception, controller, request]
+        data = double("data")
+
+        ErrorappNotifier::ControllerFailureData.should_receive(:new).with(*args).and_return(data)
+        ErrorappNotifier::Notifier.should_not_receive(:notify_error).with(data)
+        ErrorappNotifier::Notify.notify_with_controller(*args)
+      end
     end
 
     describe "#notify_with_rack" do
