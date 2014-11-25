@@ -44,16 +44,14 @@ module ErrorappNotifier
     end
 
     def action
-      if @request.respond_to?(:parameters)
-        @request.parameters['action']
-      else
-        @request.params['action']
-      end
+      parameters["action"]
     end
 
     def parameters
       parameters = if @request.respond_to?(:parameters)
                      @request.parameters
+                   elsif action_dispatch_params
+                    action_dispatch_params
                    else
                      @request.params
                    end
@@ -91,6 +89,10 @@ module ErrorappNotifier
       else
         hash
       end
+    end
+
+    def action_dispatch_params
+       @request.env['action_dispatch.request.parameters']
     end
   end
 end
